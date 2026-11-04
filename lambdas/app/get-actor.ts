@@ -6,6 +6,9 @@ import {
   parseId,
   tableName,
   toActor,
+  isRoleItem,
+  movieKey,
+  toRole,
 } from "../shared/db";
 import { response } from "../shared/http";
 import { logRequest } from "../shared/request-logger";
@@ -36,8 +39,30 @@ export const handler = async (
     if (!actorResult.Item) {
       return response(404, { message: `Actor ${actorId} not found` });
     }
-    const actor = toActor(actorResult.Item);
-    return response(200, { data: actor });
+const actor = toActor(actorResult.Item);
+
+if (movieId !== undefined) {
+  const roleResult = await ddb.send(
+    new GetCommand({
+      TableName: tableName,
+      Key: {
+        PK: movieKey(movieId),
+        SK: actorKey(actorId)
+      }
+    })
+  );
+
+  if (roleResult.Item && isRoleItem(roleResult.Item)) {
+    return response(200, {
+      data: {
+        ...actor,
+        role: toRole(roleResult.Item)
+      }
+    });
+  }
+}
+
+return response(200, { data: actor });
   } catch (err) {
     console.error("DynamoDB error:", err);
     return response(500, { message: "Internal server error", error: err });
