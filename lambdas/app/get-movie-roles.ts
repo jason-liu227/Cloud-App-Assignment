@@ -22,6 +22,23 @@ export const handler = async (
     return response(400, { message: "movieID must be a positive integer" });
   }
   try {
+    // Error handling
+    const movieResult = await ddb.send(
+      new GetCommand({
+        TableName: tableName,
+        Key: {
+          PK: movieKey(movieId),
+          SK: movieKey(movieId)
+        }
+      })
+    );
+
+    if (!movieResult.Item) {
+      return response(404, {
+        message: `Movie ${movieId} not found`
+      });
+    }
+
     // checks if an actor ID was provided
     const actorParam = event.queryStringParameters?.actor;
 
@@ -65,7 +82,6 @@ export const handler = async (
     console.error("DynamoDB error:", err);
     return response(500, {
       message: "Internal server error",
-      error: err,
     });
   }
 };
