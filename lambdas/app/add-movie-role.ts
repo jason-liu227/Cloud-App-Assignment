@@ -12,6 +12,21 @@ export const handler = async (
 
   const body = parseJsonObject(event);
   if (isResponse(body)) return body;
+  
+  const allowedFields = [
+    "movieId",
+    "actorId",
+    "roleName",
+    "roleDescription"
+  ];
+
+  for (const field of Object.keys(body)) {
+    if (!allowedFields.includes(field)) {
+      return response(400, {
+        message: "Unexpected field: " + field
+      });
+    }
+  }
 
   if (
     typeof body.movieId !== "number" ||
