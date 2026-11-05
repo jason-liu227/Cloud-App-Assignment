@@ -93,6 +93,7 @@ export const handler = async (
     );
     return response(201, { message: "Role added", data: role });
   
+
   } catch (err) {
     console.error("DynamoDB error:", err);
 
@@ -100,9 +101,29 @@ export const handler = async (
       err instanceof Error &&
       err.name === "TransactionCanceledException"
     ) {
-      return response(409, {
-        message: "Movie or actor not found, or role already exists"
-      });
+      const reasons = (
+        err as Error & {
+          CancellationReasons?: { Code?: string }[];
+        }
+      ).CancellationReasons;
+
+      if (reasons?.[0]?.Code === "ConditionalCheckFailed") {
+        return response(404, {
+          message: "Movie not found"
+        });
+      }
+
+      if (reasons?.[1]?.Code === "ConditionalCheckFailed") {
+        return response(404, {
+          message: "Actor not found"
+        });
+      }
+
+      if (reasons?.[2]?.Code === "ConditionalCheckFailed") {
+        return response(409, {
+          message: "Role already exists"
+        });
+      }
     }
 
     return response(500, {
