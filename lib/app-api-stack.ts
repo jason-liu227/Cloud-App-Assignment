@@ -93,6 +93,19 @@ export class AppApiStack extends cdk.Stack {
       authorizer: userAuthorizer,
       authorizationType: apig.AuthorizationType.CUSTOM,
     };
+
+    const adminApiKey = api.addApiKey('AdminApiKey');
+
+    const adminUsagePlan = api.addUsagePlan('AdminUsagePlan', {
+      name: 'AdminUsagePlan'
+    });
+
+    adminUsagePlan.addApiKey(adminApiKey);
+
+    adminUsagePlan.addApiStage({
+      stage: api.deploymentStage
+    });
+
     // Routes
     const moviesResource = api.root.addResource('movies');
 
