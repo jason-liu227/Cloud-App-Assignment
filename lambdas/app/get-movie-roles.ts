@@ -27,6 +27,15 @@ export const handler = async (
   if (movieId === undefined) {
     return response(400, { message: "movieID must be a positive integer" });
   }
+  
+  const actorParam = event.queryStringParameters?.actor;
+  const actorId = parseId(actorParam);
+
+  if (actorParam !== undefined && actorId === undefined) {
+    return response(400, {
+      message: "actor must be a positive integer"
+    });
+  }
   try {
     // Error handling
     const movieResult = await ddb.send(
@@ -45,18 +54,7 @@ export const handler = async (
       });
     }
 
-    // checks if an actor ID was provided
-    const actorParam = event.queryStringParameters?.actor;
-
-    if (actorParam !== undefined) {
-      const actorId = parseId(actorParam);
-
-      if (actorId === undefined) {
-        return response(400, {
-          message: "actor must be a positive integer"
-        });
-      }
-
+    if (actorId !== undefined) {
       const roleResult = await ddb.send(
         new GetCommand({
           TableName: tableName,
