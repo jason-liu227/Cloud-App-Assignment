@@ -6,6 +6,10 @@ import { isResponse, parseJsonObject, response } from "../shared/http";
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  
+  console.log("Username:", "API key user");
+  console.log("Request path:", event.path);
+
   const body = parseJsonObject(event);
   if (isResponse(body)) return body;
 

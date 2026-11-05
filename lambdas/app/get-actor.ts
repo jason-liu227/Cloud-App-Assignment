@@ -16,6 +16,12 @@ import { logRequest } from "../shared/request-logger";
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  
+  const username = event.requestContext.authorizer?.username ?? "unknown";
+
+  console.log("Username:", username);
+  console.log("Request path:", event.path);
+
   logRequest(event);
 
   const actorId = parseId(event.pathParameters?.actorID);
