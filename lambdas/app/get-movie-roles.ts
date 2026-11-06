@@ -18,8 +18,7 @@ export const handler = async (
   
   const username = event.requestContext.authorizer?.username ?? "unknown";
 
-  console.log("Username:", username);
-  console.log("Request path:", event.path);
+  console.log("Username:", username, " Request path:", event.path);
 
   logRequest(event);
 

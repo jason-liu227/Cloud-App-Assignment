@@ -19,8 +19,7 @@ const isValidText = (value: unknown): value is string => {
   return typeof value === "string" && value.trim() !== "";
 };
   
-  console.log("Username:", "API key user");
-  console.log("Request path:", event.path);
+  console.log("Username:", "API key user", " Request path:", event.path);
 
   const body = parseJsonObject(event);
   if (isResponse(body)) return body;
