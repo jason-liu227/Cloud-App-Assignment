@@ -7,6 +7,18 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   
+const isValidId = (value: unknown): value is number => {
+  return (
+    typeof value === "number" &&
+    Number.isSafeInteger(value) &&
+    value > 0
+  );
+};
+
+const isValidText = (value: unknown): value is string => {
+  return typeof value === "string" && value.trim() !== "";
+};
+  
   console.log("Username:", "API key user");
   console.log("Request path:", event.path);
 
@@ -29,16 +41,10 @@ export const handler = async (
   }
 
   if (
-    typeof body.movieId !== "number" ||
-    !Number.isSafeInteger(body.movieId) ||
-    body.movieId <= 0 ||
-    typeof body.actorId !== "number" ||
-    !Number.isSafeInteger(body.actorId) ||
-    body.actorId <= 0 ||
-    typeof body.roleName !== "string" ||
-    body.roleName.trim() === "" ||
-    typeof body.roleDescription !== "string" ||
-    body.roleDescription.trim() === ""
+  !isValidId(body.movieId) ||
+  !isValidId(body.actorId) ||
+  !isValidText(body.roleName) ||
+  !isValidText(body.roleDescription)
   ) {
     return response(400, {
       message: "Missing or invalid role fields"
@@ -46,10 +52,10 @@ export const handler = async (
   }
 
   const role: Role = {
-    movieId: body.movieId as number,
-    actorId: body.actorId as number,
-    roleName: body.roleName as string,
-    roleDescription: body.roleDescription as string,
+    movieId: body.movieId,
+    actorId: body.actorId,
+    roleName: body.roleName,
+    roleDescription: body.roleDescription,
   };
 
   try {
